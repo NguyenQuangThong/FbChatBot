@@ -1,3 +1,5 @@
+package com.example.controllers;
+
 import com.github.messenger4j.Messenger;
 import com.github.messenger4j.exception.MessengerApiException;
 import com.github.messenger4j.exception.MessengerIOException;
