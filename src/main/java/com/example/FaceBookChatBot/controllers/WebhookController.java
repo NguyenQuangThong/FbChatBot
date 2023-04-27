@@ -1,4 +1,4 @@
-package com.example.controllers;
+package com.example.FaceBookChatBot.controllers;
 
 import com.github.messenger4j.Messenger;
 import com.github.messenger4j.exception.MessengerApiException;
