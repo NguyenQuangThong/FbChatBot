@@ -78,6 +78,7 @@ public class test {
                     .maxTokens(64)
                     .n(1)
                     .temperature(0.5)
+                    .model("text-davinci-002")
                     .build();
 
             // Send the response back to the user via Messenger
