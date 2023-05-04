@@ -37,7 +37,7 @@ public class test {
     @Value("${messenger4j.pageAccessToken}")
     private String pageAccessToken;
 
-    private static final Logger logger = LoggerFactory.getLogger(WebhookController.class);
+    private static final Logger logger = LoggerFactory.getLogger(test.class);
 
     private final Messenger messenger;
 
