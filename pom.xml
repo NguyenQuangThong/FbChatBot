@@ -39,10 +39,25 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-  <groupId>com.github.messenger4j</groupId>
-  <artifactId>messenger4j</artifactId>
-  <version>1.1.0</version>
-</dependency>
+			<groupId>com.github.messenger4j</groupId>
+			<artifactId>messenger4j</artifactId>
+			<version>1.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.14.2</version>
+    	</dependency>
+    	<dependency>
+			<groupId>com.theokanning.openai-gpt3-java</groupId>
+			<artifactId>service</artifactId>
+			<version>0.12.0</version>
+		</dependency>
+   	 	<dependency>
+			<groupId>com.restfb</groupId>
+			<artifactId>restfb</artifactId>
+			<version>2.27.0</version>
+    	</dependency>
 	</dependencies>
 
 	<build>

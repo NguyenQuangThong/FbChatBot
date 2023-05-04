@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
 
 import com.github.messenger4j.Messenger;
 
@@ -14,6 +15,11 @@ public class FaceBookChatBotApplication {
 			@Value("${messenger4j.appSecret}") final String appSecret,
 			@Value("${messenger4j.verifyToken}") final String verifyToken) {
 		return Messenger.create(pageAccessToken, appSecret, verifyToken);
+	}
+
+	@Bean
+	public RestTemplate restTemplate() {
+		return new RestTemplate();
 	}
 
 	public static void main(String[] args) {
