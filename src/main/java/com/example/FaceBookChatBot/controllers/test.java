@@ -29,6 +29,7 @@ public class test {
 
     @PostMapping("/webhook")
     public ResponseEntity<String> handleWebhook(@RequestBody String payload) {
+        System.out.println("Inpunt: " + payload);
         try {
             JsonNode jsonNode = new ObjectMapper().readTree(payload);
             String senderId = jsonNode.get("entry").get(0).get("messaging").get(0).get("sender").get("id").asText();
@@ -51,6 +52,7 @@ public class test {
             String requestBody = String.format("{\"recipient\": {\"id\": \"%s\"}, \"message\": {\"text\": \"%s\"}}",
                     senderId, aiResponse);
             restTemplate.postForObject(endpoint, requestBody, String.class);
+            System.out.println("Request body:" + requestBody);
 
         } catch (Exception e) {
             e.printStackTrace();
