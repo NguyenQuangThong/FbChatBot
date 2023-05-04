@@ -10,12 +10,13 @@ import com.github.messenger4j.Messenger;
 
 @SpringBootApplication
 public class FaceBookChatBotApplication {
-	@Bean
-	public Messenger messenger(@Value("${messenger4j.pageAccessToken}") String pageAccessToken,
-			@Value("${messenger4j.appSecret}") final String appSecret,
-			@Value("${messenger4j.verifyToken}") final String verifyToken) {
-		return Messenger.create(pageAccessToken, appSecret, verifyToken);
-	}
+	// @Bean
+	// public Messenger messenger(@Value("${messenger4j.pageAccessToken}") String
+	// pageAccessToken,
+	// @Value("${messenger4j.appSecret}") final String appSecret,
+	// @Value("${messenger4j.verifyToken}") final String verifyToken) {
+	// return Messenger.create(pageAccessToken, appSecret, verifyToken);
+	// }
 
 	@Bean
 	public RestTemplate restTemplate() {
