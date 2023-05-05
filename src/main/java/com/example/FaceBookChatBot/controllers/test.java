@@ -74,56 +74,44 @@ public class test {
 
     @PostMapping
     public ResponseEntity<String> handleWebhook(@RequestBody String payload,
-            @RequestHeader(SIGNATURE_HEADER_NAME) final String signature) {
-        System.out.println("Inpunt: " + payload);
-        try {
-            JsonNode jsonNode = new ObjectMapper().readTree(payload);
-            String senderId = jsonNode.get("entry").get(0).get("messaging").get(0).get("sender").get("id").asText();
-            String messageText = jsonNode.get("entry").get(0).get("messaging").get(0).get("message").get("text")
-                    .asText();
+            @RequestHeader(SIGNATURE_HEADER_NAME) final String signature) throws MessengerVerificationException {
 
-            // Use OpenAI to generate a response
-            OpenAiService openai = new OpenAiService(openaiApiKey);
-            CompletionRequest completionRequest = CompletionRequest.builder()
-                    // .engine("text-davinci-002")
-                    .prompt(String.format("User: %s\nAI:", messageText))
-                    .maxTokens(64)
-                    .n(1)
-                    .temperature(0.5)
-                    .model("text-davinci-002")
-                    .build();
+        // Send the response back to the user via Messenger
+        this.messenger.onReceiveEvents(payload, of(signature), event -> {
+            String senderId = event.senderId();
+            if (event.isTextMessageEvent()) {
+                try {
+                    logger.info("0");
+                    JsonNode jsonNode = new ObjectMapper().readTree(payload);
+                    // String senderId =
+                    // jsonNode.get("entry").get(0).get("messaging").get(0).get("sender").get("id")
+                    // .asText();
+                    String messageText = jsonNode.get("entry").get(0).get("messaging").get(0).get("message").get("text")
+                            .asText();
 
-            // Send the response back to the user via Messenger
-            String aiResponse = openai.createCompletion(completionRequest).getChoices().get(0).getText();
-            // String endpoint =
-            // String endpoint =
-            // "https://graph.facebook.com/v16.0/me/messages?fields=get_started,persistent_menu,target_audience,whitelisted_domains,greeting,account_linking_url,payment_settings,home_url,ice_breakers,platform&access_token="
-            // + pageAccessToken;
-            // String requestBody = String.format("{\"recipient\": {\"id\": \"%s\"},
-            // \"message\": {\"text\": \"%s\"}}",
-            // senderId, aiResponse);
-            // restTemplate.postForObject(endpoint, requestBody, String.class);
-            this.messenger.onReceiveEvents(payload, of(signature), event -> {
-                if (event.isTextMessageEvent()) {
-                    try {
-                        logger.info("0");
-                        handleTextMessageEvent(senderId, aiResponse);
-                        logger.info("1");
-                    } catch (MessengerApiException e) {
-                        logger.info("2");
-                        e.printStackTrace();
-                    } catch (MessengerIOException e) {
-                        logger.info("3");
-                        e.printStackTrace();
-                    }
-                } else {
-                    sendTextMessageUser(senderId, "Tôi là bot chỉ có thể xử lý tin nhắn văn bản.");
+                    // Use OpenAI to generate a response
+                    OpenAiService openai = new OpenAiService(openaiApiKey);
+                    CompletionRequest completionRequest = CompletionRequest.builder()
+                            // .engine("text-davinci-002")
+                            .prompt(String.format("User: %s\nAI:", messageText))
+                            .maxTokens(64)
+                            .n(1)
+                            .temperature(0.5)
+                            .model("text-davinci-002")
+                            .build();
+                    String aiResponse = openai.createCompletion(completionRequest).getChoices().get(0).getText();
+                    handleTextMessageEvent(senderId, aiResponse);
+                    logger.info("1");
+                } catch (Exception e) {
+                    logger.info("2");
+                    e.printStackTrace();
+
                 }
-            });
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            } else {
+                sendTextMessageUser(senderId,
+                        "Right now I can only handle text message! Please ask Thong Nguyen to upgrade me in the future!");
+            }
+        });
 
         return ResponseEntity.ok().build();
     }
