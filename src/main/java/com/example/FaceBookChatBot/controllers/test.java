@@ -83,7 +83,10 @@ public class test {
 
             // Send the response back to the user via Messenger
             String aiResponse = openai.createCompletion(completionRequest).getChoices().get(0).getText();
-            String endpoint = "https://graph.facebook.com/v13.0/me/messages?access_token=" + pageAccessToken;
+            // String endpoint =
+            // "https://graph.facebook.com/v13.0/me/messages?access_token=" +
+            // pageAccessToken;
+            String endpoint = "https://graph.facebook.com/v2.6/me/messenger_profile?access_token=" + pageAccessToken;
             String requestBody = String.format("{\"recipient\": {\"id\": \"%s\"}, \"message\": {\"text\": \"%s\"}}",
                     senderId, aiResponse);
             restTemplate.postForObject(endpoint, requestBody, String.class);
