@@ -86,7 +86,7 @@ public class test {
             // String endpoint =
             // "https://graph.facebook.com/v13.0/me/messages?access_token=" +
             // pageAccessToken;
-            String endpoint = "https://graph.facebook.com/v2.6/me/messenger_profile?access_token=" + pageAccessToken;
+            String endpoint = "https://graph.facebook.com/v16.0/me/messenger_profile?access_token=" + pageAccessToken;
             String requestBody = String.format("{\"recipient\": {\"id\": \"%s\"}, \"message\": {\"text\": \"%s\"}}",
                     senderId, aiResponse);
             System.out.println("Request body:" + requestBody);
