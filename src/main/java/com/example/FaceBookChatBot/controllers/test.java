@@ -89,8 +89,8 @@ public class test {
             String endpoint = "https://graph.facebook.com/v2.6/me/messenger_profile?access_token=" + pageAccessToken;
             String requestBody = String.format("{\"recipient\": {\"id\": \"%s\"}, \"message\": {\"text\": \"%s\"}}",
                     senderId, aiResponse);
-            restTemplate.postForObject(endpoint, requestBody, String.class);
             System.out.println("Request body:" + requestBody);
+            restTemplate.postForObject(endpoint, requestBody, String.class);
 
         } catch (Exception e) {
             e.printStackTrace();
