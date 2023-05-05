@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,10 +19,20 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.messenger4j.Messenger;
+import com.github.messenger4j.exception.MessengerApiException;
+import com.github.messenger4j.exception.MessengerIOException;
 import com.github.messenger4j.exception.MessengerVerificationException;
+import com.github.messenger4j.send.MessagePayload;
+import com.github.messenger4j.send.MessagingType;
+import com.github.messenger4j.send.NotificationType;
+import com.github.messenger4j.send.message.TextMessage;
+import com.github.messenger4j.send.recipient.IdRecipient;
+import com.github.messenger4j.webhook.event.TextMessageEvent;
 import com.theokanning.openai.completion.CompletionRequest;
 import com.theokanning.openai.service.OpenAiService;
 import static com.github.messenger4j.Messenger.*;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 @CrossOrigin("*")
 @RestController
@@ -62,7 +73,8 @@ public class test {
     }
 
     @PostMapping
-    public ResponseEntity<String> handleWebhook(@RequestBody String payload) {
+    public ResponseEntity<String> handleWebhook(@RequestBody String payload,
+            @RequestHeader(SIGNATURE_HEADER_NAME) final String signature) {
         System.out.println("Inpunt: " + payload);
         try {
             JsonNode jsonNode = new ObjectMapper().readTree(payload);
@@ -84,19 +96,62 @@ public class test {
             // Send the response back to the user via Messenger
             String aiResponse = openai.createCompletion(completionRequest).getChoices().get(0).getText();
             // String endpoint =
-            // "https://graph.facebook.com/v13.0/me/messages?access_token=" +
-            // pageAccessToken;
-            String endpoint = "https://graph.facebook.com/v16.0/me/messages?fields=get_started,persistent_menu,target_audience,whitelisted_domains,greeting,account_linking_url,payment_settings,home_url,ice_breakers,platform&access_token="
-                    + pageAccessToken;
-            String requestBody = String.format("{\"recipient\": {\"id\": \"%s\"}, \"message\": {\"text\": \"%s\"}}",
-                    senderId, aiResponse);
-            System.out.println("Request body:" + aiResponse);
-            restTemplate.postForObject(endpoint, requestBody, String.class);
+            // String endpoint =
+            // "https://graph.facebook.com/v16.0/me/messages?fields=get_started,persistent_menu,target_audience,whitelisted_domains,greeting,account_linking_url,payment_settings,home_url,ice_breakers,platform&access_token="
+            // + pageAccessToken;
+            // String requestBody = String.format("{\"recipient\": {\"id\": \"%s\"},
+            // \"message\": {\"text\": \"%s\"}}",
+            // senderId, aiResponse);
+            // restTemplate.postForObject(endpoint, requestBody, String.class);
+            this.messenger.onReceiveEvents(payload, of(signature), event -> {
+                if (event.isTextMessageEvent()) {
+                    try {
+                        logger.info("0");
+                        handleTextMessageEvent(senderId, aiResponse);
+                        logger.info("1");
+                    } catch (MessengerApiException e) {
+                        logger.info("2");
+                        e.printStackTrace();
+                    } catch (MessengerIOException e) {
+                        logger.info("3");
+                        e.printStackTrace();
+                    }
+                } else {
+                    sendTextMessageUser(senderId, "Tôi là bot chỉ có thể xử lý tin nhắn văn bản.");
+                }
+            });
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         return ResponseEntity.ok().build();
+    }
+
+    private void handleTextMessageEvent(String senderId, String answer)
+            throws MessengerApiException, MessengerIOException {
+        sendTextMessageUser(senderId, answer);
+
+    }
+
+    private void sendTextMessageUser(String idSender, String text) {
+        try {
+            final IdRecipient recipient = IdRecipient.create(idSender);
+            final NotificationType notificationType = NotificationType.REGULAR;
+            final String metadata = "DEVELOPER_DEFINED_METADATA";
+
+            final TextMessage textMessage = TextMessage.create(text, empty(),
+                    of(metadata));
+            final MessagePayload messagePayload = MessagePayload.create(recipient,
+                    MessagingType.RESPONSE, textMessage,
+                    of(notificationType), empty());
+            this.messenger.send(messagePayload);
+        } catch (MessengerApiException | MessengerIOException e) {
+            handleSendException(e);
+        }
+    }
+
+    private void handleSendException(Exception e) {
+        logger.error("Message could not be sent. An unexpected error occurred.", e);
     }
 }
