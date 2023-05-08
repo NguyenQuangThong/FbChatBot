@@ -82,11 +82,10 @@ public class WebhookController {
                     // Use OpenAI to generate a response
                     OpenAiService openai = new OpenAiService(openaiApiKey);
                     CompletionRequest completionRequest = CompletionRequest.builder()
-                            .prompt(String.format("User: %s\nAI:", messageText))
-                            .maxTokens(64)
-                            .n(1)
+                            .prompt(messageText)
                             .temperature(0.5)
                             .model("text-davinci-003")
+                            .echo(true)
                             .build();
                     String aiResponse = openai.createCompletion(completionRequest).getChoices().get(0).getText();
                     handleTextMessageEvent(senderId, aiResponse);
