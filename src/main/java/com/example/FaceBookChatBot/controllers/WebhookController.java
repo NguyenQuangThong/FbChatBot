@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.messenger4j.Messenger;
 import com.github.messenger4j.exception.MessengerApiException;
 import com.github.messenger4j.exception.MessengerIOException;
@@ -78,25 +76,17 @@ public class WebhookController {
             if (event.isTextMessageEvent()) {
                 try {
                     logger.info("0");
-                    // JsonNode jsonNode = new ObjectMapper().readTree(payload);
-                    // String senderId =
-                    // jsonNode.get("entry").get(0).get("messaging").get(0).get("sender").get("id")
-                    // .asText();
-                    // String messageText =
-                    // jsonNode.get("entry").get(0).get("messaging").get(0).get("message").get("text")
-                    // .asText();
                     final TextMessageEvent textMessageEvent = event.asTextMessageEvent();
                     final String messageText = textMessageEvent.text();
 
                     // Use OpenAI to generate a response
                     OpenAiService openai = new OpenAiService(openaiApiKey);
                     CompletionRequest completionRequest = CompletionRequest.builder()
-                            // .engine("text-davinci-002")
                             .prompt(String.format("User: %s\nAI:", messageText))
                             .maxTokens(64)
                             .n(1)
                             .temperature(0.5)
-                            .model("text-davinci-002")
+                            .model("text-davinci-003")
                             .build();
                     String aiResponse = openai.createCompletion(completionRequest).getChoices().get(0).getText();
                     handleTextMessageEvent(senderId, aiResponse);
