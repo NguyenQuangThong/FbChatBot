@@ -84,6 +84,8 @@ public class WebhookController {
                     CompletionRequest completionRequest = CompletionRequest.builder()
                             .prompt(messageText)
                             .temperature(0.5)
+                            .n(1)
+                            .maxTokens(2048)
                             .model("text-davinci-003")
                             .build();
                     String aiResponse = openai.createCompletion(completionRequest).getChoices().get(0).getText();
