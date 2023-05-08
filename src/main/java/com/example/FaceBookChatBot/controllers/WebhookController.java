@@ -26,6 +26,7 @@ import com.github.messenger4j.send.MessagingType;
 import com.github.messenger4j.send.NotificationType;
 import com.github.messenger4j.send.message.TextMessage;
 import com.github.messenger4j.send.recipient.IdRecipient;
+import com.github.messenger4j.webhook.event.TextMessageEvent;
 import com.theokanning.openai.completion.CompletionRequest;
 import com.theokanning.openai.service.OpenAiService;
 import static com.github.messenger4j.Messenger.*;
@@ -77,12 +78,15 @@ public class WebhookController {
             if (event.isTextMessageEvent()) {
                 try {
                     logger.info("0");
-                    JsonNode jsonNode = new ObjectMapper().readTree(payload);
+                    // JsonNode jsonNode = new ObjectMapper().readTree(payload);
                     // String senderId =
                     // jsonNode.get("entry").get(0).get("messaging").get(0).get("sender").get("id")
                     // .asText();
-                    String messageText = jsonNode.get("entry").get(0).get("messaging").get(0).get("message").get("text")
-                            .asText();
+                    // String messageText =
+                    // jsonNode.get("entry").get(0).get("messaging").get(0).get("message").get("text")
+                    // .asText();
+                    final TextMessageEvent textMessageEvent = event.asTextMessageEvent();
+                    final String messageText = textMessageEvent.text();
 
                     // Use OpenAI to generate a response
                     OpenAiService openai = new OpenAiService(openaiApiKey);
